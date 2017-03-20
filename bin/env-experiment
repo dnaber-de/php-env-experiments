@@ -1,0 +1,16 @@
+#!/usr/bin/env php
+<?php # -*- coding: utf-8 -*-
+
+namespace EnvExperiment;
+
+use EnvExperiment\Command\Check;
+use Symfony\Component\Console\Application;
+
+const VERSION = 'dev-master';
+
+! is_readable( dirname( __DIR__ ) . '/vendor/autoload.php' ) and exit( 'Please run composer install first' );
+require_once dirname( __DIR__ ) . '/vendor/autoload.php';
+
+$app = new Application( 'Env Experiments', VERSION );
+$app->add( new Check( dirname( __DIR__ ) ) );
+$app->run();
