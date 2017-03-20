@@ -71,9 +71,10 @@ class Check extends Command {
 		$output->writeln( 'PHP_OS: ' . PHP_OS );
 		$output->writeln( 'PHP_SAP: ' . PHP_SAPI );
 		$output->writeln( 'PHP_VERSION: ' . PHP_VERSION );
+		$output->writeln( 'PHP_EOL: ' . str_replace( [ "\r", "\n" ], [ 'CR', 'LF' ] , PHP_EOL ) );
 
 		$output->writeln( '------' );
-		$output->writeln( '<info>Checking for `php` command …</info>');
+		$output->writeln( '<info>Checking `php` command ...</info>' );
 		$php_exists = $env->commandExists( 'php' )
 			? 'yes' : 'no';
 		$output->writeln( "php exists: {$php_exists}" );
@@ -86,7 +87,7 @@ class Check extends Command {
 		$output->writeln( "Found php executable is actually executable: {$php_is_executable}" );
 
 		$output->writeln( '------' );
-		$output->writeln( '<info>Checking for `wp` command …</info>' );
+		$output->writeln( '<info>Checking `wp` command ...</info>' );
 		$wp_exists = $env->commandExists( 'wp' )
 			? 'yes' : 'no';
 		$output->writeln( "wp exists: {$wp_exists}" );
@@ -99,14 +100,28 @@ class Check extends Command {
 		$output->writeln( "Found wp executable is actually executable: {$wp_is_executable}" );
 
 		$local_wp_version = '';
-		if ( 'yes' === $wp_is_executable ) {
+		if ( 'null' !== $found_wp ) {
 			$local_wp_version = trim( $env->run( [ $found_wp, '--version' ] ) );
 			$local_wp_version = str_replace( 'WP-CLI ', '', $local_wp_version );
 		}
 
+		$output->writeln( '------' );
+		$output->writeln( '<info>Checking `composer` command ...</info>' );
+		$composer_exists = $env->commandExists( 'composer' )
+			? 'yes' : 'no';
+		$output->writeln( "composer exists: {$composer_exists}" );
+		$found_composer = $finder->find( 'composer' );
+		$found_composer or $found_composer = 'null';
+		$output->writeln( "Found composer executable: {$found_composer}" );
+		$composer_is_executable = $env->isExecutable( $found_composer )
+			? 'yes' : 'no';
+		$output->writeln( "Found composer executable is actually executable: {$composer_is_executable}" );
+		if ( 'null' !== $found_composer ) {
+			$env->run( [ $found_composer, '--version' ] );
+		}
 
 		$output->writeln( '------' );
-		$output->writeln( '<info>Checking self …</info>' );
+		$output->writeln( '<info>Checking self ...</info>' );
 		$self = "{$this->base_dir}/bin/env-experiment";
 		$self_is_executable = $env->isExecutable( $self )
 			? 'yes' : 'no';
@@ -122,7 +137,7 @@ class Check extends Command {
 		}
 
 		$output->writeln( '------' );
-		$output->writeln( '<info>Checking phar …</info>' );
+		$output->writeln( '<info>Checking phar ...</info>' );
 		$phar = "{$this->base_dir}/bin/wp";
 		$phar_is_executable = $env->isExecutable( $phar )
 			? 'yes' : 'no';

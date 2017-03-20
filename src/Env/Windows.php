@@ -48,14 +48,18 @@ final class Windows implements Shell {
 			->getOutput();
 		$this->output->writeln( " -  Command Output: " . str_replace( PHP_EOL, '[LF]', $output ) );
 
-		return empty( $output );
+		$output = explode( PHP_EOL, trim( $output ) );
+
+		return ! empty( $output ) && is_readable( trim( $output[ 0 ] ) );
 	}
 
 	public function isExecutable( $file ) {
 
-		$executable_extensions = [ '.exe', '.bat', '.cmd', '.com' ];
+		$executable_extensions = [ 'exe', 'bat', 'cmd', 'com' ];
 
-		return in_array( pathinfo( $file, PATHINFO_EXTENSION ), $executable_extensions );
+		$extension = strtolower( pathinfo( $file, PATHINFO_EXTENSION ) );
+
+		return in_array( $extension, $executable_extensions );
 	}
 
 	public function run( array $command ) {
